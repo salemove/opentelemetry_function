@@ -1,0 +1,18 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Publish package to hex.pm
+        uses: wesleimp/action-publish-hex@ae719f0fead451221d2ca0127c0aae70c5f90b4c
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
