@@ -43,7 +43,7 @@ defmodule OpentelemetryFunction do
   """
   def wrap(fun_or_mfa, span_name \\ "Function.wrap")
 
-  @spec wrap(fun(), binary()) :: fun()
+  @spec wrap(fun, binary) :: fun
   Enum.each(0..9, fn arity ->
     args = for _ <- 1..arity, arity > 0, do: Macro.unique_var(:arg, __MODULE__)
 
@@ -64,7 +64,7 @@ defmodule OpentelemetryFunction do
     end
   end)
 
-  @spec wrap(mfa(), binary()) :: fun()
+  @spec wrap({module, atom, [term]}, binary()) :: fun
   def wrap({mod, fun, args}, span_name) do
     span_ctx = OpenTelemetry.Tracer.start_span(span_name)
     ctx = OpenTelemetry.Ctx.get_current()
