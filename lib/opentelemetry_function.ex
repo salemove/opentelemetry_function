@@ -57,6 +57,11 @@ defmodule OpentelemetryFunction do
 
         try do
           original_fun.(unquote_splicing(args))
+        rescue
+          exception ->
+            OpenTelemetry.Span.record_exception(span_ctx, exception, __STACKTRACE__, [])
+            OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+            reraise(exception, __STACKTRACE__)
         after
           OpenTelemetry.Span.end_span(span_ctx)
         end
@@ -75,6 +80,11 @@ defmodule OpentelemetryFunction do
 
       try do
         apply(mod, fun, args)
+      rescue
+        exception ->
+          OpenTelemetry.Span.record_exception(span_ctx, exception, __STACKTRACE__, [])
+          OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+          reraise(exception, __STACKTRACE__)
       after
         OpenTelemetry.Span.end_span(span_ctx)
       end
