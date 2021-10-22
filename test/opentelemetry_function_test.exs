@@ -132,6 +132,45 @@ defmodule OpentelemetryFunctionTest do
     assert root_span_trace_id == implicit_child_trace_id
   end
 
+  @tag :capture_log
+  test "sets span status to error on exception" do
+    Process.flag(:trap_exit, true)
+
+    fun = fn ->
+      raise "some exception"
+    end
+
+    OpenTelemetry.Tracer.with_span "root span" do
+      task = async(OpentelemetryFunction.wrap(fun, "child span"), 0)
+
+      assert {{%RuntimeError{message: "some exception"}, _}, {Task, :await, _}} =
+               catch_exit(Task.await(task))
+    end
+
+    assert_receive {:span, span(name: "root span", trace_id: root_span_trace_id)}
+
+    expected_status = OpenTelemetry.status(:error, "")
+
+    assert_receive {:span,
+                    span(
+                      name: "child span",
+                      status: ^expected_status,
+                      trace_id: implicit_child_trace_id,
+                      events: [
+                        event(
+                          name: "exception",
+                          attributes: [
+                            {"exception.type", "Elixir.RuntimeError"},
+                            {"exception.message", "some exception"},
+                            {"exception.stacktrace", _stacktrace}
+                          ]
+                        )
+                      ]
+                    )}
+
+    assert root_span_trace_id == implicit_child_trace_id
+  end
+
   defp async(fun, args_count) do
     args = for count <- 1..args_count, args_count > 0, do: :"arg#{count}"
 
