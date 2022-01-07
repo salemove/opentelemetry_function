@@ -19,11 +19,10 @@ defmodule OpentelemetryFunctionTest do
     :application.set_env(:opentelemetry, :tracer, :otel_tracer_default)
 
     :application.set_env(:opentelemetry, :processors, [
-      {:otel_batch_processor, %{scheduled_delay_ms: 1}}
+      {:otel_batch_processor, %{scheduled_delay_ms: 1, exporter: {:otel_exporter_pid, self()}}}
     ])
 
     :application.start(:opentelemetry)
-    :otel_batch_processor.set_exporter(:otel_exporter_pid, self())
 
     :ok
   end
@@ -156,17 +155,16 @@ defmodule OpentelemetryFunctionTest do
                       name: "child span",
                       status: ^expected_status,
                       trace_id: implicit_child_trace_id,
-                      events: [
-                        event(
-                          name: "exception",
-                          attributes: [
-                            {"exception.type", "Elixir.RuntimeError"},
-                            {"exception.message", "some exception"},
-                            {"exception.stacktrace", _stacktrace}
-                          ]
-                        )
-                      ]
+                      events: events
                     )}
+
+    [event(name: "exception", attributes: event_attributes)] = :otel_events.list(events)
+
+    assert %{
+             "exception.type" => "Elixir.RuntimeError",
+             "exception.message" => "some exception",
+             "exception.stacktrace" => _stacktrace
+           } = :otel_attributes.map(event_attributes)
 
     assert root_span_trace_id == implicit_child_trace_id
   end
