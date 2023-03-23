@@ -11,7 +11,7 @@ dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:opentelemetry_function, "~> 0.1.0-rc.1"}
+    {:opentelemetry_function, "~> 0.1"}
   ]
 end
 ```

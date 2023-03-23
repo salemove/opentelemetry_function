@@ -38,7 +38,7 @@ defmodule OpentelemetryFunction do
       :jobs.enqueue(:tasks_queue, {mod, fun, args})
 
       # After
-      wrapped_fun = OpenTelemetry.Function.wrap({mod, fun, args})
+      wrapped_fun = OpentelemetryFunction.wrap({mod, fun, args})
       :jobs.enqueue(:tasks_queue, wrapped_fun)
   """
   def wrap(fun_or_mfa, span_name \\ "Function.wrap")
