@@ -50,7 +50,7 @@ defmodule OpentelemetryFunction.MixProject do
       ### Dev tools
 
       # Static type checking tool (see Erlang Dialyzer for more info)
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
 
       # Build documentation (run `mix docs`)
       {:ex_doc, "~> 0.25", only: [:dev, :test], runtime: false}
