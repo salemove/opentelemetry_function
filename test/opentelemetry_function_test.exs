@@ -148,7 +148,7 @@ defmodule OpentelemetryFunctionTest do
 
     assert_receive {:span, span(name: "root span", trace_id: root_span_trace_id)}
 
-    expected_status = OpenTelemetry.status(:error, "")
+    expected_status = OpenTelemetry.status(:error, "some exception")
 
     assert_receive {:span,
                     span(

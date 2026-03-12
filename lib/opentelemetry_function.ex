@@ -57,7 +57,11 @@ defmodule OpentelemetryFunction do
           rescue
             exception ->
               OpenTelemetry.Tracer.record_exception(exception, __STACKTRACE__)
-              OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+
+              OpenTelemetry.Tracer.set_status(
+                OpenTelemetry.status(:error, Exception.message(exception))
+              )
+
               reraise(exception, __STACKTRACE__)
           end
         end
@@ -76,7 +80,11 @@ defmodule OpentelemetryFunction do
         rescue
           exception ->
             OpenTelemetry.Tracer.record_exception(exception, __STACKTRACE__)
-            OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+
+            OpenTelemetry.Tracer.set_status(
+              OpenTelemetry.status(:error, Exception.message(exception))
+            )
+
             reraise(exception, __STACKTRACE__)
         end
       end
