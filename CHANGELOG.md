@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 * Start span within function, not outside. This adds support for delayed and
   repeated invocations of the wrapped function.
