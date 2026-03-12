@@ -45,7 +45,7 @@ defmodule OpentelemetryFunction do
 
   @spec wrap(fun, binary) :: fun
   Enum.each(0..9, fn arity ->
-    args = for _ <- 1..arity, arity > 0, do: Macro.unique_var(:arg, __MODULE__)
+    args = for _ <- 1..arity//1, arity > 0, do: Macro.unique_var(:arg, __MODULE__)
 
     def wrap(original_fun, span_name) when is_function(original_fun, unquote(arity)) do
       outer_ctx = OpenTelemetry.Ctx.get_current()
