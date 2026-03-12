@@ -48,22 +48,18 @@ defmodule OpentelemetryFunction do
     args = for _ <- 1..arity, arity > 0, do: Macro.unique_var(:arg, __MODULE__)
 
     def wrap(original_fun, span_name) when is_function(original_fun, unquote(arity)) do
-      span_ctx = OpenTelemetry.Tracer.start_span(span_name)
-      ctx = OpenTelemetry.Ctx.get_current()
+      outer_ctx = OpenTelemetry.Ctx.get_current()
 
       fn unquote_splicing(args) ->
-        OpenTelemetry.Ctx.attach(ctx)
-        OpenTelemetry.Tracer.set_current_span(span_ctx)
-
-        try do
-          original_fun.(unquote_splicing(args))
-        rescue
-          exception ->
-            OpenTelemetry.Span.record_exception(span_ctx, exception, __STACKTRACE__, [])
-            OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
-            reraise(exception, __STACKTRACE__)
-        after
-          OpenTelemetry.Span.end_span(span_ctx)
+        OpenTelemetry.Tracer.with_span outer_ctx, span_name, %{} do
+          try do
+            original_fun.(unquote_splicing(args))
+          rescue
+            exception ->
+              OpenTelemetry.Tracer.record_exception(exception, __STACKTRACE__)
+              OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+              reraise(exception, __STACKTRACE__)
+          end
         end
       end
     end
@@ -71,22 +67,18 @@ defmodule OpentelemetryFunction do
 
   @spec wrap({module, atom, [term]}, binary()) :: fun
   def wrap({mod, fun, args}, span_name) do
-    span_ctx = OpenTelemetry.Tracer.start_span(span_name)
-    ctx = OpenTelemetry.Ctx.get_current()
+    outer_ctx = OpenTelemetry.Ctx.get_current()
 
     fn ->
-      OpenTelemetry.Ctx.attach(ctx)
-      OpenTelemetry.Tracer.set_current_span(span_ctx)
-
-      try do
-        apply(mod, fun, args)
-      rescue
-        exception ->
-          OpenTelemetry.Span.record_exception(span_ctx, exception, __STACKTRACE__, [])
-          OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
-          reraise(exception, __STACKTRACE__)
-      after
-        OpenTelemetry.Span.end_span(span_ctx)
+      OpenTelemetry.Tracer.with_span outer_ctx, span_name, %{} do
+        try do
+          apply(mod, fun, args)
+        rescue
+          exception ->
+            OpenTelemetry.Tracer.record_exception(exception, __STACKTRACE__)
+            OpenTelemetry.Tracer.set_status(OpenTelemetry.status(:error, ""))
+            reraise(exception, __STACKTRACE__)
+        end
       end
     end
   end

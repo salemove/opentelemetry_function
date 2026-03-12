@@ -44,8 +44,8 @@ defmodule OpentelemetryFunction.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:opentelemetry_api, "~> 1.0"},
-      {:opentelemetry, "~> 1.0", only: [:test]},
+      {:opentelemetry_api, "~> 1.1"},
+      {:opentelemetry, "~> 1.1", only: [:test]},
 
       ### Dev tools
 
