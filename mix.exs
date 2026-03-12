@@ -5,7 +5,7 @@ defmodule OpentelemetryFunction.MixProject do
     [
       app: :opentelemetry_function,
       version: "0.2.0",
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: [
