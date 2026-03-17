@@ -4,8 +4,8 @@ defmodule OpentelemetryFunction.MixProject do
   def project do
     [
       app: :opentelemetry_function,
-      version: "0.1.0",
-      elixir: "~> 1.11",
+      version: "0.2.0",
+      elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: [
@@ -44,13 +44,13 @@ defmodule OpentelemetryFunction.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:opentelemetry_api, "~> 1.0"},
-      {:opentelemetry, "~> 1.0", only: [:test]},
+      {:opentelemetry_api, "~> 1.1"},
+      {:opentelemetry, "~> 1.1", only: [:test]},
 
       ### Dev tools
 
       # Static type checking tool (see Erlang Dialyzer for more info)
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
 
       # Build documentation (run `mix docs`)
       {:ex_doc, "~> 0.25", only: [:dev, :test], runtime: false}
