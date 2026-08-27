@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   elixir:
     name: OTP ${{matrix.pair.otp_version}} / Elixir ${{matrix.pair.elixir}}
@@ -21,12 +24,14 @@ jobs:
               otp: '28.4'
             lint: lint
     steps:
-      - uses: actions/checkout@v6
-      - uses: erlef/setup-beam@v1
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124
         with:
           otp-version: ${{matrix.pair.otp}}
           elixir-version: ${{matrix.pair.elixir}}
-      - uses: actions/cache@v5
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25
         with:
           path: |
             deps
